@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LakeLogic — Minnesota Fisheries Data</title>
+  <meta name="description"
+    content="Search Minnesota lakes for fish stocking history, survey data, species, and lake information using MnDNR data." />
+  <link rel="icon" type="image/png" href="logo_notext.png" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=4" />
+</head>
+
+<body>
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="header-brand">
+      <img src="logo_small1.png" alt="LakeLogic Logo" class="header-icon" />
+      <span class="header-title">LakeLogic</span>
+      <span class="header-sub">Minnesota Fisheries Data</span>
+    </div>
+    <div class="header-actions">
+      <span id="data-status-badge" class="data-badge" title="Click to check data status" onclick="checkDataStatus()">⚙️
+        Checking data...</span>
+      <span id="status-badge" class="status-badge">Ready</span>
+    </div>
+  </header>
+
+  <!-- ── Global Loader ───────────────────────────────────────────────────── -->
+  <div id="global-loader" class="global-loader hidden">
+    <div class="loader-spinner"></div>
+    <span id="loader-message">Loading...</span>
+  </div>
+
+  <!-- ── Main Layout ─────────────────────────────────────────────────────── -->
+  <main class="app-layout">
+
+    <!-- LEFT SIDEBAR ──────────────────────────────────────────────────── -->
+    <aside class="sidebar">
+
+      <!-- Search mode tabs -->
+      <div class="search-tabs">
+        <button class="search-tab active" id="tab-name" onclick="switchSearchTab('name')">Lake Name</button>
+        <button class="search-tab" id="tab-species" onclick="switchSearchTab('species')">By Species</button>
+      </div>
+
+      <!-- Lake Name panel -->
+      <div id="panel-name" class="search-panel">
+        <div class="input-group">
+          <label for="lake-name-input">Lake Name</label>
+          <input type="text" id="lake-name-input" placeholder="e.g. Minnetonka, Mille Lacs..." autocomplete="off" />
+          <span class="input-hint">💡 Try a partial name (e.g. "minne" for Minnetonka) or add a county name</span>
+        </div>
+        <button class="btn-primary" id="btn-search-name" onclick="searchByName()">
+          <span>Search Lakes</span>
+        </button>
+      </div>
+
+
+
+      <!-- Species Search panel -->
+      <div id="panel-species" class="search-panel hidden">
+        <div class="input-group">
+          <label for="species-search-input">Fish Species</label>
+          <input type="text" id="species-search-input" list="species-datalist"
+            placeholder="e.g. Walleye, Muskellunge, Bass..." autocomplete="off" />
+          <datalist id="species-datalist"></datalist>
+          <span class="input-hint">💡 Type or select from the dropdown — includes all species in local data</span>
+        </div>
+
+        <button class="btn-primary" id="btn-search-species" onclick="searchBySpecies()">
+          <span>Search by Species</span>
+        </button>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="input-group" style="margin-bottom: 12px; margin-top: -8px;">
+        <label for="sort-by">Sort Results By</label>
+        <select id="sort-by" onchange="applyFilters()">
+          <option value="distance">Distance</option>
+          <option value="recent">Most Recently Stocked</option>
+          <option value="cpue">Highest CPUE (Recent Survey)</option>
+          <option value="quantity">Total Fish Stocked</option>
+          <option value="name">Lake Name</option>
+          <option value="area">Lake Area</option>
+        </select>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <!-- Near Location Filter -->
+      <div class="filters-section" style="margin-bottom: 12px;">
+        <div class="filters-header" onclick="toggleLocationFilter()" style="cursor: pointer;">
+          <span style="display: flex; align-items: center; gap: 6px;">Near Location <span id="location-icon"
+              style="font-size: 0.75rem; transition: transform 0.2s; transform: rotate(-90deg);">▼</span></span>
+          <button class="btn-ghost-sm" onclick="event.stopPropagation(); clearLocationFilter()">Clear</button>
+        </div>
+        <div id="location-body" class="hidden"
+          style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+          <div class="input-group">
+            <label for="address-input">Address or Coordinates</label>
+            <input type="text" id="address-input" placeholder="City, address, or lat,lon..." autocomplete="off" />
+            <span class="input-hint">💡 You can also click anywhere on the map to set a location</span>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label for="radius-input">Radius</label>
+              <select id="radius-input">
+                <option value="1609">1 mile</option>
+                <option value="4828">3 miles</option>
+                <option value="8046">5 miles</option>
+                <option value="12070">7.5 miles</option>
+                <option value="16093">10 miles</option>
+                <option value="40234">25 miles</option>
+                <option value="80467">50 miles</option>
+                <option value="160934">100 miles</option>
+                <option value="241401">150 miles</option>
+                <option value="402336">250 miles</option>
+                <option value="all" selected>Anywhere (All Lakes)</option>
+              </select>
+            </div>
+          </div>
+          <span class="input-hint">💡 Set radius above to filter your search by distance</span>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-section">
+        <div class="filters-header" onclick="toggleFilters()" style="cursor: pointer;">
+          <span style="display: flex; align-items: center; gap: 6px;">Filters <span id="filters-icon"
+              style="font-size: 0.75rem; transition: transform 0.2s; transform: rotate(-90deg);">▼</span></span>
+          <button class="btn-ghost-sm" onclick="event.stopPropagation(); clearFilters()">Clear</button>
+        </div>
+
+        <div id="filters-body" class="hidden"
+          style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+          <div class="input-group">
+            <label for="access-filter">Public Access</label>
+            <select id="access-filter" onchange="applyFilters()">
+              <option value="">All Lakes</option>
+              <option value="access">Boat / Public Access Only</option>
+            </select>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label for="area-min">Min Acres</label>
+              <input type="number" id="area-min" placeholder="0" oninput="applyFilters()" />
+            </div>
+            <div class="input-group">
+              <label for="area-max">Max Acres</label>
+              <input type="number" id="area-max" placeholder="∞" oninput="applyFilters()" />
+            </div>
+          </div>
+
+
+
+
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- CENTER: Map + Results ─────────────────────────────────────────── -->
+    <section class="center-panel">
+      <div class="map-container">
+        <div id="map"></div>
+        <div id="map-overlay" class="map-overlay">
+          <div class="map-overlay-content">
+            <div class="map-overlay-icon">🏞️</div>
+            <p>Search for a lake above, or click the map to search nearby</p>
+          </div>
+        </div>
+      </div>
+      <div class="results-panel">
+        <div class="results-header">
+          <div>
+            <div id="results-title" class="results-title">Search Results</div>
+            <div id="results-count" class="results-count"></div>
+          </div>
+        </div>
+        <div id="results-list" class="results-list"></div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Lake Detail ─────────────────────────────────────────────── -->
+    <section class="detail-panel" id="detail-panel">
+      <div id="detail-empty" class="detail-empty">
+        <img src="logo_notext.png" class="empty-icon-img" alt="Lake" />
+        <p>Select a lake to view detailed stocking history, survey data, and lake information</p>
+      </div>
+
+      <div id="detail-content" class="hidden">
+        <!-- Lake header -->
+        <div class="detail-header">
+          <div class="detail-header-inner">
+            <h2 id="detail-lake-name"></h2>
+            <div id="detail-meta" class="detail-meta"></div>
+            <div id="detail-tags" class="detail-tags"></div>
+          </div>
+          <button class="btn-ghost-sm" onclick="closeDetail()">✕</button>
+        </div>
+
+        <!-- Detail Tabs -->
+        <div class="detail-tabs">
+          <button class="detail-tab active" onclick="switchDetailTab('stocking', this)">📦 Stocking</button>
+          <button class="detail-tab" onclick="switchDetailTab('survey',   this)">📊 Surveys</button>
+          <button class="detail-tab" onclick="switchDetailTab('info',     this)">ℹ️ Lake Info</button>
+        </div>
+
+        <!-- Stocking Tab -->
+        <div class="detail-tab-content" id="tab-stocking">
+          <div class="stocking-lag-banner">
+            <span>⏱️</span>
+            <div><strong>4–6 Year Lag:</strong> Stocked fish take 3–6 seasons to reach catchable size (~14"). South MN:
+              3–4 yrs · North: 4–5 yrs · Border: 5–6 yrs.</div>
+          </div>
+
+          <!-- Chart controls -->
+          <div class="tab-controls">
+            <div class="control-row">
+              <label for="history-years">Show:</label>
+              <select id="history-years" onchange="loadStockingHistory(currentLakeId)">
+                <option value="5">Last 5 years</option>
+                <option value="10" selected>Last 10 years</option>
+                <option value="20">Last 20 years</option>
+                <option value="all">All years</option>
+              </select>
+            </div>
+            <div class="control-row chart-metric-row" id="chart-metric-row" style="display:none">
+              <label>Chart metric:</label>
+              <label class="radio-label"><input type="radio" name="chart-metric" value="quantity" checked
+                  onchange="onChartMetricChange()"> Number of Fish</label>
+              <label class="radio-label"><input type="radio" name="chart-metric" value="weight"
+                  onchange="onChartMetricChange()"> Pounds</label>
+            </div>
+          </div>
+
+          <div id="stocking-loading" class="loading-row hidden">
+            <div class="mini-spinner"></div> Loading stocking history...
+          </div>
+          <div id="stocking-content"></div>
+        </div>
+
+        <!-- Survey Tab -->
+        <div class="detail-tab-content hidden" id="tab-survey">
+          <div id="survey-loading" class="loading-row hidden">
+            <div class="mini-spinner"></div> Loading survey data...
+          </div>
+          <div id="survey-content"></div>
+        </div>
+
+        <!-- Info Tab -->
+        <div class="detail-tab-content hidden" id="tab-info">
+          <div id="info-content"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="app.js?v=2"></script>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.zip
+.DS_Store
+
+# Cloud environment secrets — never commit these
+cloud/.env
+
+# Local data cache — too large for git
+data/
+*.log
+refresh_log.txt

@@ -1,0 +1,35 @@
+{
+  "name": "lakelogicmn",
+  "version": "1.0.0",
+  "description": "LakeLogic webapp - fish stocking, survey, and lake search",
+  "author": "LakeLogic",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "download": "node scripts/download.js",
+    "download:year": "node scripts/download.js --year=",
+    "download:lakes": "node scripts/download.js --lakes-only",
+    "upload": "cmd /c \"set GCS_BUCKET=YOUR_BUCKET_NAME&& node scripts/upload-to-gcs.js\""
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^7.0.0",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "node-fetch": "^2.7.0"
+  },
+  "bin": "server.js",
+  "pkg": {
+    "assets": [
+      "public/**/*",
+      "data/**/*"
+    ],
+    "ignore": [
+      "node:sqlite"
+    ]
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  }
+}

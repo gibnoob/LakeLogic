@@ -1,0 +1,13 @@
+node_modules/
+data/
+dist/
+*.exe
+*.zip
+.git/
+.vscode/
+cloud/node_modules/
+job/node_modules/
+*.bat
+*.ps1
+Launcher*
+launcher*

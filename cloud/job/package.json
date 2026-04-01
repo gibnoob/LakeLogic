@@ -1,0 +1,17 @@
+{
+  "name": "lakelogic-refresh-job",
+  "version": "1.0.0",
+  "description": "LakeLogic — Cloud Run Job for monthly MN DNR data refresh",
+  "main": "refresh.js",
+  "scripts": {
+    "start": "node refresh.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^7.0.0",
+    "cheerio": "^1.0.0",
+    "node-fetch": "^2.7.0"
+  }
+}

@@ -1,0 +1,27 @@
+# ── Never bake data into the image — it lives in GCS ─────────────────────────
+data/
+
+# ── Dependencies built fresh inside the container ────────────────────────────
+node_modules/
+cloud/node_modules/
+
+# ── Version control ───────────────────────────────────────────────────────────
+.git/
+.gitignore
+
+# ── Local launcher / standalone bundle files ──────────────────────────────────
+*.bat
+*.ps1
+*.cs
+*.exe
+*.zip
+Launcher*
+launcher*
+
+# ── Build artifacts ───────────────────────────────────────────────────────────
+dist/
+
+# ── Editor / OS noise ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.log

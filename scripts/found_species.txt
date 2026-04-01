@@ -1,0 +1,11 @@
+'BLC': 'Black Crappie',
+'BLG': 'Bluegill',
+'HSF': 'Hybrid Sunfish',
+'LMB': 'Largemouth Bass',
+'NOP': 'Northern Pike',
+'RKB': 'Rock Bass',
+'SMB': 'Smallmouth Bass',
+'TLC': 'Tullibee (Cisco)',
+'WAE': 'Walleye',
+'WTS': 'White Sucker',
+'YEP': 'Yellow Perch'
