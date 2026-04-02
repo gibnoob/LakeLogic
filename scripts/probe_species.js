@@ -2,16 +2,28 @@ const fs = require('fs');
 const path = require('path');
 
 const SPECIES_NAMES = {
-    WAE: 'Walleye', NOP: 'Northern Pike', MUE: 'Muskellunge', LMB: 'Largemouth Bass',
-    SMB: 'Smallmouth Bass', BLG: 'Bluegill Sunfish', YEP: 'Yellow Perch', BLC: 'Black Crappie',
-    WHC: 'White Crappie', RKB: 'Rock Bass', TLC: 'Tullibee (Cisco)', LKT: 'Lake Trout', LAT: 'Lake Trout',
-    BRB: 'Brown Bullhead', BKB: 'Black Bullhead', YEB: 'Yellow Bullhead', CCF: 'Channel Catfish',
-    FHC: 'Flathead Catfish', LKS: 'Lake Sturgeon', BUR: 'Burbot', PKS: 'Pumpkinseed Sunfish',
-    HSF: 'Hybrid Sunfish', GSF: 'Green Sunfish', BKT: 'Brook Trout', BNT: 'Brown Trout',
-    RBT: 'Rainbow Trout', SPK: 'Splake', PSH: 'Paddlefish', COC: 'Common Carp',
-    FHM: 'Fathead Minnow', GZS: 'Gizzard Shad', SAR: 'Sauger', WTS: 'White Sucker',
-    SXS: 'Saugeye', WON: 'White Bass', PMK: 'Pumpkinseed Sunfish', BOG: 'Bluegill Sunfish',
-    BOF: 'Bowfin (Dogfish)', QIL: 'Quillback', GOS: 'Golden Shiner', WHS: 'White Sucker'
+    // Game Fish
+    WAE: 'Walleye', NOP: 'Northern Pike', MUE: 'Muskellunge', SXS: 'Saugeye', SAR: 'Sauger', WON: 'White Bass',
+    // Bass & Panfish
+    LMB: 'Largemouth Bass', SMB: 'Smallmouth Bass', BLG: 'Bluegill Sunfish', BOG: 'Bluegill Sunfish',
+    BLC: 'Black Crappie', BCS: 'Black Crappie', WHC: 'White Crappie', RKB: 'Rock Bass',
+    YEP: 'Yellow Perch', PKS: 'Pumpkinseed Sunfish', PMK: 'Pumpkinseed Sunfish', HSF: 'Hybrid Sunfish', GSF: 'Green Sunfish',
+    // Trout & Salmon
+    BKT: 'Brook Trout', BNT: 'Brown Trout', RBT: 'Rainbow Trout', LKT: 'Lake Trout', LAT: 'Lake Trout',
+    SPK: 'Splake', TLC: 'Tullibee (Cisco)',
+    // Catfish & Bullheads
+    CCF: 'Channel Catfish', FHC: 'Flathead Catfish', BRB: 'Brown Bullhead', BKB: 'Black Bullhead',
+    BLB: 'Black Bullhead', YEB: 'Yellow Bullhead',
+    // Other Sportfish
+    LKS: 'Lake Sturgeon', PSH: 'Paddlefish', BUR: 'Burbot', BOF: 'Bowfin (Dogfish)',
+    // Rough Fish & Carp
+    COC: 'Common Carp', CAP: 'Common Carp', GZS: 'Gizzard Shad', QIL: 'Quillback', WTS: 'White Sucker', WHS: 'White Sucker',
+    // Minnows, Shiners & Darters
+    FHM: 'Fathead Minnow', GOS: 'Golden Shiner', BNM: 'Bluntnose Minnow', CSH: 'Common Shiner',
+    BNS: 'Blacknose Shiner', SPO: 'Spottail Shiner', SFS: 'Spotfin Shiner', BKS: 'Blackchin Shiner',
+    PGS: 'Pugnose Shiner', FTD: 'Finescale Dace', BND: 'Blacknose Dace', LND: 'Longnose Dace',
+    CRC: 'Creek Chub', CNM: 'Central Mudminnow', JND: 'Johnny Darter', IOD: 'Iowa Darter',
+    LED: 'Least Darter', TPM: 'Tadpole Madtom', BST: 'Brook Stickleback'
 };
 
 const surveyDir = path.join(__dirname, '../data/surveys');
