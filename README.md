@@ -255,7 +255,7 @@ Don't want to mess with a terminal? There's a GUI launcher:
 
 ## 🔒 Privacy & Data
 
-All data comes from the **Minnesota DNR's public API** and website. LakeLogic is entirely local — no accounts, no cloud, no tracking. Your fishing secrets stay yours.
+All data comes from the **Minnesota DNR's public API** and website. As this application is a derivative work, we acknowledge the **MNDNR** as the owner and primary contributor of the data and software used. Your fishing secrets stay yours.
 
 Data source: [Minnesota DNR LakeFinder](https://www.dnr.state.mn.us/lakefind/index.html)
 
